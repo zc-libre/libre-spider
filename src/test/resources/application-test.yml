@@ -1,0 +1,82 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  
+  h2:
+    console:
+      enabled: true
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+# MyBatis-Plus configuration
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# Crawler configuration for testing
+crawler:
+  platform: xhs
+  crawler-type: search
+  keywords: "测试"
+  login-type: cookie
+  
+  # 测试用Cookie - 需要替换为完整的cookie字符串
+  # 获取方法：
+  # 1. 登录 https://www.xiaohongshu.com
+  # 2. F12打开开发者工具 -> Network标签页
+  # 3. 刷新页面，找到任意请求的Cookie请求头
+  # 4. 复制完整的Cookie值
+  # 注意：MediaCrawler虽然配置完整cookie，但实际只使用其中的web_session登录
+  cookies: "abRequestId=a8aea918-37fe-51d2-a25f-28f487a2e52b; a1=1976dfd3d7eaw4d1401oq1tqk0lm1ihq6exuqioed30000127753; webId=880bb957eed26995dc8b68605c3ca29f; gid=yjWKfif2JDKSyjWKfifqfd3lWd0E4fy48ylACdfy9AT817q86y3xAA888yJWW2q80iy8iYYS; web_session=040069b78e089424401cbac5543a4b8a295caa; xsecappid=xhs-pc-web; webBuild=4.70.2; acw_tc=0a4ab8e117513097392707260e2578b8db3bdd26efe6491b9a24b2fdcd1bd0; websectiga=29098a4cf41f76ee3f8db19051aaa60c0fc7c5e305572fec762da32d457d76ae; sec_poison_id=3b24ac4b-0338-44cf-87d3-3a004e69d8b1"
+  
+  # 保存登录状态（测试环境启用）
+  save-login-state: true
+  
+  xhs:
+    enabled: false  # Disable actual crawling in tests
+    base-url: https://www.xiaohongshu.com
+    api-base-url: https://edith.xiaohongshu.com
+    headless: true
+    devtools: false
+    timeout: 5000
+    retryCount: 1
+    delay: 100
+    max-notes-count: 10
+    max-comments-count: 5
+  
+  storage:
+    type: json
+    json-path: ./test-data/xhs/json
+    cookie-path: ./test-data/cookies
+    batchSize: 10
+
+# Logging configuration for tests
+logging:
+  level:
+    com.libre.spider: INFO
+    org.springframework.web: WARN
+    org.springframework.security: WARN
+    org.mybatis: WARN
+
+# Server configuration
+server:
+  port: 0  # Random port for tests
+
+# OpenAPI configuration (disabled for tests)
+springdoc:
+  api-docs:
+    enabled: false

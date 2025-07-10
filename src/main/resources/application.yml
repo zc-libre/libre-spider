@@ -1,0 +1,61 @@
+server:
+  port: 14315
+
+spring:
+  application:
+    name: libre-spider
+  
+  # 数据库配置
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgres://localhost:5432/libre_spider
+    username: libre
+    password: 123456
+
+  # H2数据库配置（开发环境）
+  profiles:
+    active: dev
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password: 
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+
+# MyBatis-Plus配置
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  mapper-locations: classpath:mapper/*.xml
+
+# 小红书爬虫配置
+xhs:
+  # Cookie字符串（将你的cookie粘贴到这里，必须包含 web_session）
+  # 获取方式：登录小红书网页版，F12打开开发者工具，在Network中找到请求头的Cookie值
+  cookies: "abRequestId=a8aea918-37fe-51d2-a25f-28f487a2e52b; a1=1976dfd3d7eaw4d1401oq1tqk0lm1ihq6exuqioed30000127753; webId=880bb957eed26995dc8b68605c3ca29f; gid=yjWKfif2JDKSyjWKfifqfd3lWd0E4fy48ylACdfy9AT817q86y3xAA888yJWW2q80iy8iYYS; web_session=040069b78e089424401cbac5543a4b8a295caa; xsecappid=xhs-pc-web; webBuild=4.72.0; unread={%22ub%22:%226863e842000000002400bbed%22%2C%22ue%22:%2268663d3b00000000120309d4%22%2C%22uc%22:25}; websectiga=9730ffafd96f2d09dc024760e253af6ab1feb0002827740b95a255ddf6847fc8; sec_poison_id=9dc4f2e2-35e9-4258-9439-114627572358; acw_tc=0a0bb29117521364002453369ef609ad49ce07f0e497923ad9d58659454425; loadts=1752136443543"
+  
+  # API域名
+  apiDomain: https://edith.xiaohongshu.com
+  
+  # 网站域名
+  webDomain: https://www.xiaohongshu.com
+  
+  # 是否启用CDP模式（Chrome DevTools Protocol，用于更底层的浏览器控制）
+  enableCdpMode: false
