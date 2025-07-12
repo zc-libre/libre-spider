@@ -2,13 +2,14 @@ package com.libre.spider;
 
 import com.libre.spider.service.XhsCrawlerService;
 import com.libre.spider.enums.SearchSortType;
+import com.libre.spider.model.SearchResponse;
+import com.libre.spider.model.SearchItem;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 搜索功能测试
@@ -26,49 +27,60 @@ public class SearchTest {
 
 		try {
 			// 搜索美食相关的笔记
-			Map<String, Object> response = xhsCrawlerService.searchNotes("美食", 1, SearchSortType.GENERAL);
+			SearchResponse response = xhsCrawlerService.searchNotes("美食", 1, SearchSortType.GENERAL);
 
-			if (response != null && response.get("has_more") != null) {
+			if (response != null && response.getSuccess() != null && response.getSuccess()) {
 				System.out.println("✓ 搜索成功");
-				System.out.println("- 是否有更多: " + response.get("has_more"));
+				System.out.println("- 响应消息: " + response.getMsg());
+				System.out.println("- 响应代码: " + response.getCode());
 
-				// 获取笔记列表
-				@SuppressWarnings("unchecked")
-				List<Map<String, Object>> items = (List<Map<String, Object>>) response.get("items");
+				if (response.getData() != null) {
+					System.out.println("- 是否有更多: " + response.getData().getHasMore());
 
-				if (items != null && !items.isEmpty()) {
-					System.out.println("- 找到 " + items.size() + " 条笔记");
+					// 获取笔记列表
+					List<SearchItem> items = response.getData().getItems();
 
-					// 打印第一条笔记的信息
-					Map<String, Object> firstNote = items.get(0);
-					System.out.println("\n第一条笔记信息:");
-					System.out.println("- ID: " + firstNote.get("id"));
-					System.out.println("- 标题: " + firstNote.get("display_title"));
+					if (items != null && !items.isEmpty()) {
+						System.out.println("- 找到 " + items.size() + " 条笔记");
 
-					@SuppressWarnings("unchecked")
-					Map<String, Object> noteCard = (Map<String, Object>) firstNote.get("note_card");
-					if (noteCard != null) {
-						System.out.println("- 类型: " + noteCard.get("type"));
+						// 打印第一条笔记的信息
+						SearchItem firstNote = items.get(0);
+						System.out.println("\n第一条笔记信息:");
+						System.out.println("- ID: " + firstNote.getId());
+						System.out.println("- 模型类型: " + firstNote.getModelType());
+						System.out.println("- xsec_token: " + firstNote.getXsecToken());
 
-						@SuppressWarnings("unchecked")
-						Map<String, Object> interactInfo = (Map<String, Object>) noteCard.get("interact_info");
-						if (interactInfo != null) {
-							System.out.println("- 点赞数: " + interactInfo.get("liked_count"));
+						if (firstNote.getNoteCard() != null) {
+							System.out.println("- 标题: " + firstNote.getNoteCard().getDisplayTitle());
+							System.out.println("- 类型: " + firstNote.getNoteCard().getType());
+
+							if (firstNote.getNoteCard().getInteractInfo() != null) {
+								System.out
+									.println("- 点赞数: " + firstNote.getNoteCard().getInteractInfo().getLikedCount());
+								System.out
+									.println("- 评论数: " + firstNote.getNoteCard().getInteractInfo().getCommentCount());
+							}
+
+							if (firstNote.getNoteCard().getUser() != null) {
+								System.out.println("- 作者: " + firstNote.getNoteCard().getUser().getNickname());
+								System.out.println("- 作者ID: " + firstNote.getNoteCard().getUser().getUserId());
+							}
 						}
-
-						@SuppressWarnings("unchecked")
-						Map<String, Object> user = (Map<String, Object>) noteCard.get("user");
-						if (user != null) {
-							System.out.println("- 作者: " + user.get("nickname"));
-						}
+					}
+					else {
+						System.out.println("× 未找到笔记数据");
 					}
 				}
 				else {
-					System.out.println("× 未找到笔记数据");
+					System.out.println("× 搜索数据为空");
 				}
 			}
 			else {
-				System.out.println("× 搜索响应无效");
+				System.out.println("× 搜索失败");
+				if (response != null) {
+					System.out.println("- 错误消息: " + response.getMsg());
+					System.out.println("- 错误代码: " + response.getCode());
+				}
 			}
 		}
 		catch (Exception e) {

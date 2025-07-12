@@ -8,13 +8,21 @@ spring:
   # 数据库配置
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgres://localhost:5432/libre_spider
+    url: jdbc:postgresql://localhost:5432/libre_spider
     username: libre
     password: 123456
+  
+  # Liquibase配置
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
 
   # H2数据库配置（开发环境）
   profiles:
     active: dev
+  threads:
+    virtual:
+      enabled: true
 
 ---
 spring:
@@ -22,14 +30,12 @@ spring:
     activate:
       on-profile: dev
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:testdb
-    username: sa
-    password: 
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/libre_spider
+    username: libre
+    password: 123456
+  liquibase:
+    enabled: true
 
 
 # MyBatis-Plus配置
@@ -49,7 +55,7 @@ mybatis-plus:
 xhs:
   # Cookie字符串（将你的cookie粘贴到这里，必须包含 web_session）
   # 获取方式：登录小红书网页版，F12打开开发者工具，在Network中找到请求头的Cookie值
-  cookies: "abRequestId=a8aea918-37fe-51d2-a25f-28f487a2e52b; a1=1976dfd3d7eaw4d1401oq1tqk0lm1ihq6exuqioed30000127753; webId=880bb957eed26995dc8b68605c3ca29f; gid=yjWKfif2JDKSyjWKfifqfd3lWd0E4fy48ylACdfy9AT817q86y3xAA888yJWW2q80iy8iYYS; web_session=040069b78e089424401cbac5543a4b8a295caa; xsecappid=xhs-pc-web; webBuild=4.72.0; unread={%22ub%22:%226863e842000000002400bbed%22%2C%22ue%22:%2268663d3b00000000120309d4%22%2C%22uc%22:25}; websectiga=9730ffafd96f2d09dc024760e253af6ab1feb0002827740b95a255ddf6847fc8; sec_poison_id=9dc4f2e2-35e9-4258-9439-114627572358; acw_tc=0a0bb29117521364002453369ef609ad49ce07f0e497923ad9d58659454425; loadts=1752136443543"
+  cookies: "abRequestId=a8aea918-37fe-51d2-a25f-28f487a2e52b; a1=1976dfd3d7eaw4d1401oq1tqk0lm1ihq6exuqioed30000127753; webId=880bb957eed26995dc8b68605c3ca29f; gid=yjWKfif2JDKSyjWKfifqfd3lWd0E4fy48ylACdfy9AT817q86y3xAA888yJWW2q80iy8iYYS; webBuild=4.72.0; acw_tc=0ad587bd17523160218745314ed2225f95c9dc606f96493c1bcc847741f9fe; websectiga=3633fe24d49c7dd0eb923edc8205740f10fdb18b25d424d2a2322c6196d2a4ad; sec_poison_id=ec90139d-8f4e-482d-afe5-b54fb22200e7; xsecappid=xhs-pc-web; web_session=040069b78e089424401c6c75473a4b01759829; unread={%22ub%22:%22686d30d8000000002400cfb3%22%2C%22ue%22:%22686ef2b00000000017030abd%22%2C%22uc%22:27}; loadts=1752317201774"
   
   # API域名
   apiDomain: https://edith.xiaohongshu.com
@@ -59,3 +65,57 @@ xhs:
   
   # 是否启用CDP模式（Chrome DevTools Protocol，用于更底层的浏览器控制）
   enableCdpMode: false
+  
+  # 爬虫配置
+  crawler:
+    # 关键词配置（支持多个关键词，用逗号分隔）
+    keywords: "西安黑丝,高跟黑丝,西安美女"
+    
+    # 每个关键词最大抓取笔记数量
+    maxNotesPerKeyword: 100
+    
+    # 搜索页数（每页通常10-20条）
+    maxPages: 20
+    
+    # 排序类型：GENERAL(综合), TIME_DESCENDING(最新), POPULARITY_DESCENDING(最热)
+    sortType: GENERAL
+    
+    # 是否获取笔记详情
+    enableNoteDetail: true
+    
+    # 是否获取用户信息
+    enableUserInfo: true
+    
+    # 是否获取评论信息
+    enableComments: false
+    
+    # 请求间隔（毫秒）
+    requestInterval: 3000
+    
+    # 并发数量（批量处理时）
+    concurrency: 3
+    
+    # 重试次数
+    retryCount: 3
+    
+    # 数据存储配置
+    storage:
+      # 存储类型：DATABASE(数据库), JSON(JSON文件), CSV(CSV文件), ALL(所有)
+      type: DATABASE
+      
+      # 文件存储路径
+      filePath: "data/xhs"
+      
+      # 是否去重（基于noteId）
+      enableDeduplication: true
+    
+    # 定时任务配置
+    schedule:
+      # 是否启用定时任务
+      enabled: true
+      
+      # Cron表达式（默认每天8点执行）
+      cron: "0 0 8 * * ?"
+      
+      # 任务超时时间（分钟）
+      timeout: 60

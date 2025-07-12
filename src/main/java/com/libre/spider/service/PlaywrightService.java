@@ -77,7 +77,7 @@ public class PlaywrightService {
 			.setArgs(Arrays.asList("--disable-blink-features=AutomationControlled", "--no-sandbox",
 					"--disable-dev-shm-usage"));
 
-		browser = playwright.chromium().launch(options); // 改用Chrome提高性能
+		browser = playwright.firefox().launch(options); // 改用Chrome提高性能
 		log.info("浏览器启动成功，headless={}", headless);
 	}
 

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!-- 创建爬取任务表 -->
+    <changeSet id="001-create-crawl-task-table" author="system">
+        <createTable tableName="crawl_task" remarks="爬取任务表">
+            <column name="id" type="BIGSERIAL" remarks="主键ID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="task_name" type="VARCHAR(255)" remarks="任务名称">
+                <constraints nullable="false"/>
+            </column>
+            <column name="keyword" type="VARCHAR(255)" remarks="关键词">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(50)" defaultValue="PENDING" remarks="任务状态">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_time" type="TIMESTAMP" remarks="开始时间"/>
+            <column name="end_time" type="TIMESTAMP" remarks="结束时间"/>
+            <column name="total_notes" type="INTEGER" defaultValueNumeric="0" remarks="总笔记数"/>
+            <column name="success_notes" type="INTEGER" defaultValueNumeric="0" remarks="成功笔记数"/>
+            <column name="failed_notes" type="INTEGER" defaultValueNumeric="0" remarks="失败笔记数"/>
+            <column name="error_message" type="TEXT" remarks="错误信息"/>
+            <column name="create_time" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" remarks="创建时间"/>
+            <column name="update_time" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" remarks="更新时间"/>
+        </createTable>
+    </changeSet>
+
+    <!-- 创建笔记信息表 -->
+    <changeSet id="002-create-note-info-table" author="system">
+        <createTable tableName="note_info" remarks="笔记信息表">
+            <column name="id" type="BIGSERIAL" remarks="主键ID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="note_id" type="VARCHAR(255)" remarks="笔记ID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(500)" remarks="笔记标题"/>
+            <column name="content" type="TEXT" remarks="笔记内容"/>
+            <column name="note_type" type="VARCHAR(50)" remarks="笔记类型"/>
+            <column name="user_id" type="VARCHAR(255)" remarks="用户ID"/>
+            <column name="user_name" type="VARCHAR(255)" remarks="用户昵称"/>
+            <column name="user_avatar" type="VARCHAR(500)" remarks="用户头像URL"/>
+            <column name="cover_url" type="VARCHAR(500)" remarks="封面图片URL"/>
+            <column name="image_urls" type="TEXT" remarks="图片URLs"/>
+            <column name="video_url" type="VARCHAR(500)" remarks="视频URL"/>
+            <column name="like_count" type="INTEGER" defaultValueNumeric="0" remarks="点赞数"/>
+            <column name="comment_count" type="INTEGER" defaultValueNumeric="0" remarks="评论数"/>
+            <column name="collect_count" type="INTEGER" defaultValueNumeric="0" remarks="收藏数"/>
+            <column name="share_count" type="INTEGER" defaultValueNumeric="0" remarks="分享数"/>
+            <column name="note_url" type="VARCHAR(500)" remarks="笔记URL"/>
+            <column name="publish_time" type="TIMESTAMP" remarks="发布时间"/>
+            <column name="keyword" type="VARCHAR(255)" remarks="关键词"/>
+            <column name="task_id" type="BIGINT" remarks="任务ID"/>
+            <column name="create_time" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" remarks="创建时间"/>
+            <column name="update_time" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" remarks="更新时间"/>
+        </createTable>
+    </changeSet>
+
+    <!-- 创建用户信息表 -->
+    <changeSet id="003-create-user-info-table" author="system">
+        <createTable tableName="user_info" remarks="用户信息表">
+            <column name="id" type="BIGSERIAL" remarks="主键ID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="VARCHAR(255)" remarks="用户ID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="nickname" type="VARCHAR(255)" remarks="用户昵称"/>
+            <column name="avatar" type="VARCHAR(500)" remarks="用户头像URL"/>
+            <column name="description" type="TEXT" remarks="用户简介"/>
+            <column name="profile_url" type="VARCHAR(500)" remarks="用户主页URL"/>
+            <column name="followers_count" type="INTEGER" defaultValueNumeric="0" remarks="粉丝数"/>
+            <column name="following_count" type="INTEGER" defaultValueNumeric="0" remarks="关注数"/>
+            <column name="like_count" type="INTEGER" defaultValueNumeric="0" remarks="获赞数"/>
+            <column name="note_count" type="INTEGER" defaultValueNumeric="0" remarks="笔记数"/>
+            <column name="tags" type="TEXT" remarks="标签信息"/>
+            <column name="location" type="VARCHAR(255)" remarks="地理位置"/>
+            <column name="gender" type="VARCHAR(20)" remarks="性别"/>
+            <column name="is_verified" type="BOOLEAN" defaultValueBoolean="false" remarks="是否认证用户"/>
+            <column name="verification_info" type="VARCHAR(500)" remarks="认证信息"/>
+            <column name="task_id" type="BIGINT" remarks="任务ID"/>
+            <column name="create_time" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" remarks="创建时间"/>
+            <column name="update_time" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" remarks="更新时间"/>
+        </createTable>
+    </changeSet>
+
+    <!-- 添加唯一约束和索引 -->
+    <changeSet id="004-add-constraints-and-indexes" author="system">
+        <!-- note_info 表的唯一约束和索引 -->
+        <addUniqueConstraint tableName="note_info" columnNames="note_id" constraintName="uk_note_id"/>
+        <createIndex tableName="note_info" indexName="idx_user_id">
+            <column name="user_id"/>
+        </createIndex>
+        <createIndex tableName="note_info" indexName="idx_keyword">
+            <column name="keyword"/>
+        </createIndex>
+        <createIndex tableName="note_info" indexName="idx_task_id">
+            <column name="task_id"/>
+        </createIndex>
+
+        <!-- user_info 表的唯一约束和索引 -->
+        <addUniqueConstraint tableName="user_info" columnNames="user_id" constraintName="uk_user_id"/>
+        <createIndex tableName="user_info" indexName="idx_user_task_id">
+            <column name="task_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

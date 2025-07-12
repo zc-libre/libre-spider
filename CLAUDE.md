@@ -167,3 +167,19 @@ curl "http://localhost:14315/api/xhs/login/status"
 3. **请求头顺序可能影响请求成功率**
 4. **Cookie 有效期有限**，需要定期更新
 5. **遵守 robots.txt 和使用条款**，合理控制爬取频率
+
+## 数据库错误
+
+### 数据库初始化问题
+- SQL 语句执行失败时的常见原因：
+  - 数据库表未正确创建
+  - 数据库连接配置错误
+  - 缺少必要的建表 SQL 脚本
+- **具体错误示例**：
+  - `org.postgresql.util.PSQLException: ERROR: relation "crawler_task_status" does not exist`
+  - 这表明 `crawler_task_status` 表不存在，需要检查数据库初始化脚本
+  - 解决方法：
+    1. 检查 `application.yml` 中的数据库配置
+    2. 确认已执行正确的建表 SQL
+    3. 检查数据库迁移脚本（如 Flyway）是否正确配置
+    4. 手动创建缺失的数据库表
